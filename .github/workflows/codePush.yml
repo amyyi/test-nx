@@ -56,7 +56,7 @@ jobs:
     - name: Set env
       run: |
         corepack enable
-        corepack prepare yarn@stable --activate
+        corepack prepare yarn@3.5.1 --activate
         yarn config set nodeLinker node-modules
 
     - name: Print env
