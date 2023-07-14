@@ -1,0 +1,87 @@
+name: release code push
+
+on:
+  workflow_dispatch:
+    inputs:
+      projectName:
+        description: 'Which app do you want to code push'
+        required: true
+        type: choice
+        options:
+        - telu
+        - nexim
+      platform:
+        description: 'Which platform do you want to release'
+        required: true
+        type: choice
+        options:
+          - iOS
+          - Android
+          - iOS & android
+      environment:
+        description: 'Which environment do you want to deploy'
+        required: true
+        type: choice
+        options:
+          - Development
+          - Production
+      targetVersion:
+        description: "Target store version: (2.0.2)"
+        required: true
+        type: string
+      codePushVersion:
+        description: "Target code push version: v2.0.2-(3)"
+        required: true
+        type: string
+      description:
+        description: "description: (some note)"
+        type: string
+      forceUpdate:
+        description: "Whether to enable mandatory update?"
+        type: boolean
+      enableUpdate:
+        description: 'Enable this update?'
+        type: boolean
+jobs:
+  deploy:
+    # doc: https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Bundle dependencies
+      run: sudo gem install bundler
+
+    - name: Set env
+      run: |
+        corepack enable
+        corepack prepare yarn@3.5.0 --activate
+        yarn config set nodeLinker node-modules
+
+    - name: Print env
+      run: echo && yarn -v && which yarn && node -v && ruby -v && pod --version
+
+    - name: Install watchman
+      run: brew -v && brew install watchman && watchman -v
+
+    - name: Clean all the things
+      run: |
+        watchman watch-del-all
+        rm -rf ./node_modules
+        yarn cache clean --all
+        rm -rf $TMPDIR/react-*
+        rm -rf /tmp/haste-map-react-native-packager-*
+
+    - name: Build
+      run: |
+        yarn install && rm -rf /tmp/metro-bundler-cache-*  && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf /tmp/metro-*
+
+    - name: Upload logs on fail
+      if: ${{ failure() }}
+      run: cat /private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/**/*pack.log
+
+    - name: Deploy to Codepush
+      run: yarn codepush:deploy
+      env:
+        APPCENTER_ACCESS_TOKEN: ${{secrets.APPCENTER}}
