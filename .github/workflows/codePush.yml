@@ -75,7 +75,7 @@ jobs:
 
     - name: Build
       run: |
-        yarn install && rm -rf /tmp/metro-bundler-cache-*  && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf /tmp/metro-*
+        yarn install
 
     - name: Upload logs on fail
       if: ${{ failure() }}
