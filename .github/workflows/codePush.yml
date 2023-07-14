@@ -82,6 +82,6 @@ jobs:
       run: cat /private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/**/*pack.log
 
     - name: Deploy to Codepush
-      run: yarn codepush:deploy
+      run: npx appcenter codepush release-react -a ${{github.workspace}}/apps/project-a/src/main.tsx -d Development -t 0.0.0 --description 'Release v0.0.0-0.0.' -x
       env:
         APPCENTER_ACCESS_TOKEN: ${{secrets.APPCENTER}}
