@@ -1,5 +1,5 @@
-import App from './app/App';
 import { TestLib } from '@test-nx/shared-ui-layout';
 
-// AppRegistry.registerComponent('ProjectA', () => App);
+import App from './app/App'
+// eslint-disable-next-line no-console
 console.log(TestLib)
